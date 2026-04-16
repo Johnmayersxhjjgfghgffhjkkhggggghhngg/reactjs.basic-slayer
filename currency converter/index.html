@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert currencies between nations instantly with live exchange rates. Beautiful, fast, and free currency converter.">
+    <title>CurrencyX — Global Currency Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="bgParticles"></div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <span class="logo-icon">⟐</span>
+                <span class="logo-text">Currency<span class="logo-accent">X</span></span>
+            </a>
+            <nav class="nav">
+                <span class="nav-badge">Live Rates</span>
+                <span class="nav-status" id="statusDot">
+                    <span class="pulse-dot"></span>
+                    Connected
+                </span>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="main">
+        <section class="hero">
+            <h1 class="hero-title">
+                <span class="hero-line">Convert Currency</span>
+                <span class="hero-line gradient-text">Across the Globe</span>
+            </h1>
+            <p class="hero-subtitle">Real-time exchange rates for 150+ currencies. Fast, accurate, and beautifully simple.</p>
+        </section>
+
+        <!-- Converter Card -->
+        <section class="converter-section">
+            <div class="converter-card" id="converterCard">
+                <!-- Glow effects -->
+                <div class="card-glow"></div>
+
+                <!-- From Currency -->
+                <div class="currency-block">
+                    <label class="currency-label">From</label>
+                    <div class="currency-input-row">
+                        <div class="select-wrapper">
+                            <select id="fromCurrency" class="currency-select">
+                                <!-- Options populated by JS -->
+                            </select>
+                            <span class="select-flag" id="fromFlag"></span>
+                        </div>
+                        <input 
+                            type="number" 
+                            id="fromAmount" 
+                            class="amount-input" 
+                            value="1" 
+                            min="0" 
+                            step="any"
+                            placeholder="Enter amount"
+                        >
+                    </div>
+                </div>
+
+                <!-- Swap Button -->
+                <div class="swap-container">
+                    <button class="swap-btn" id="swapBtn" title="Swap currencies">
+                        <svg class="swap-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/>
+                        </svg>
+                    </button>
+                    <div class="swap-line"></div>
+                </div>
+
+                <!-- To Currency -->
+                <div class="currency-block">
+                    <label class="currency-label">To</label>
+                    <div class="currency-input-row">
+                        <div class="select-wrapper">
+                            <select id="toCurrency" class="currency-select">
+                                <!-- Options populated by JS -->
+                            </select>
+                            <span class="select-flag" id="toFlag"></span>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="toAmount" 
+                            class="amount-input result-input" 
+                            readonly 
+                            placeholder="Converted amount"
+                        >
+                    </div>
+                </div>
+
+                <!-- Convert Button -->
+                <button class="convert-btn" id="convertBtn">
+                    <span class="btn-text">Convert Now</span>
+                    <span class="btn-loader" id="btnLoader"></span>
+                    <span class="btn-shimmer"></span>
+                </button>
+
+                <!-- Result Display -->
+                <div class="result-panel" id="resultPanel">
+                    <div class="rate-display">
+                        <span class="rate-label">Exchange Rate</span>
+                        <span class="rate-value" id="rateValue">—</span>
+                    </div>
+                    <div class="rate-display">
+                        <span class="rate-label">Inverse Rate</span>
+                        <span class="rate-value rate-secondary" id="inverseRate">—</span>
+                    </div>
+                    <div class="last-updated" id="lastUpdated">
+                        <span class="update-dot"></span>
+                        Last updated: —
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Popular Rates Grid -->
+        <section class="popular-section">
+            <h2 class="section-title">Popular Exchange Rates</h2>
+            <div class="rates-grid" id="ratesGrid">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <p class="footer-text">© 2026 CurrencyX — Built with precision & care</p>
+            <p class="footer-sub">Rates provided by open exchange rate APIs. For informational purposes only.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
