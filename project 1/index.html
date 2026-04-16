@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Null-G – Anti-Gravity Flight Simulator</title>
+  <meta name="description" content="A futuristic anti-gravity flight simulator with 6 degrees of freedom, gravity wells, asteroid fields, and momentum-based propulsion." />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Three.js r160 via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+</head>
+<body>
+
+  <!-- ===== CANVAS (Three.js renders here) ===== -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- ===== LOADING SCREEN ===== -->
+  <div id="loadingScreen">
+    <div class="loader-content">
+      <div class="loader-logo">NULL-G</div>
+      <div class="loader-subtitle">ANTI-GRAVITY FLIGHT SYSTEM</div>
+      <div class="loader-bar-wrap"><div id="loaderBar" class="loader-bar"></div></div>
+      <div id="loaderStatus" class="loader-status">INITIALIZING PHYSICS ENGINE...</div>
+    </div>
+  </div>
+
+  <!-- ===== START SCREEN ===== -->
+  <div id="startScreen" class="hidden">
+    <div class="start-content">
+      <h1 class="start-title">NULL-G</h1>
+      <p class="start-subtitle">Anti-Gravity Flight Simulator</p>
+      <div class="start-controls-grid">
+        <div class="ctrl-item"><kbd>W / S</kbd><span>Forward / Brake</span></div>
+        <div class="ctrl-item"><kbd>A / D</kbd><span>Strafe Left / Right</span></div>
+        <div class="ctrl-item"><kbd>↑ ↓</kbd><span>Pitch Up / Down</span></div>
+        <div class="ctrl-item"><kbd>← →</kbd><span>Yaw Left / Right</span></div>
+        <div class="ctrl-item"><kbd>Q / E</kbd><span>Roll Left / Right</span></div>
+        <div class="ctrl-item"><kbd>SPACE</kbd><span>Stabilize (Dampener)</span></div>
+        <div class="ctrl-item"><kbd>SHIFT</kbd><span>Boost Thrust</span></div>
+        <div class="ctrl-item"><kbd>F</kbd><span>Autopilot Toggle</span></div>
+        <div class="ctrl-item"><kbd>R</kbd><span>Reset Position</span></div>
+        <div class="ctrl-item"><kbd>M</kbd><span>Toggle Mode</span></div>
+      </div>
+      <button id="btnStart" class="btn-primary">ENGAGE ENGINES</button>
+      <button id="btnFreeFlight" class="btn-secondary">FREE FLIGHT MODE</button>
+    </div>
+  </div>
+
+  <!-- ===== COCKPIT HUD ===== -->
+  <div id="hud" class="hidden">
+
+    <!-- Top Bar -->
+    <div class="hud-top-bar">
+      <div class="hud-mode" id="hudMode">MISSION MODE</div>
+      <div class="hud-clock" id="hudClock">00:00</div>
+      <div class="hud-score">SCORE: <span id="hudScore">0</span></div>
+    </div>
+
+    <!-- Left Panel: Velocity & Thrust -->
+    <div class="hud-panel hud-left">
+      <div class="hud-section-title">PROPULSION</div>
+      <div class="hud-stat-row">
+        <span class="hud-label">SPEED</span>
+        <span class="hud-value" id="hudSpeed">0.00</span>
+        <span class="hud-unit">m/s</span>
+      </div>
+      <div class="hud-stat-row">
+        <span class="hud-label">THRUST</span>
+        <div class="bar-container">
+          <div class="bar-fill" id="thrustBar" style="width:0%"></div>
+        </div>
+        <span class="hud-value" id="hudThrust">0%</span>
+      </div>
+      <div class="hud-stat-row">
+        <span class="hud-label">BOOST</span>
+        <div class="bar-container">
+          <div class="bar-fill boost" id="boostBar" style="width:100%"></div>
+        </div>
+        <span class="hud-value" id="hudBoost">100%</span>
+      </div>
+
+      <div class="hud-divider"></div>
+
+      <div class="hud-section-title">VELOCITY VECTOR</div>
+      <div class="hud-stat-row">
+        <span class="hud-label">VX</span>
+        <span class="hud-value axis-x" id="hudVX">0.00</span>
+      </div>
+      <div class="hud-stat-row">
+        <span class="hud-label">VY</span>
+        <span class="hud-value axis-y" id="hudVY">0.00</span>
+      </div>
+      <div class="hud-stat-row">
+        <span class="hud-label">VZ</span>
+        <span class="hud-value axis-z" id="hudVZ">0.00</span>
+      </div>
+    </div>
+
+    <!-- Right Panel: Orientation & Gravity -->
+    <div class="hud-panel hud-right">
+      <div class="hud-section-title">ORIENTATION</div>
+      <div class="hud-stat-row">
+        <span class="hud-label">PITCH</span>
+        <span class="hud-value axis-x" id="hudPitch">0.0°</span>
+      </div>
+      <div class="hud-stat-row">
+        <span class="hud-label">YAW</span>
+        <span class="hud-value axis-y" id="hudYaw">0.0°</span>
+      </div>
+      <div class="hud-stat-row">
+        <span class="hud-label">ROLL</span>
+        <span class="hud-value axis-z" id="hudRoll">0.0°</span>
+      </div>
+
+      <div class="hud-divider"></div>
+
+      <div class="hud-section-title">GRAVITY INFLUENCE</div>
+      <div class="hud-stat-row">
+        <span class="hud-label">FIELD</span>
+        <span class="hud-value" id="hudGravField">NONE</span>
+      </div>
+      <div class="hud-stat-row">
+        <span class="hud-label">PULL</span>
+        <div class="bar-container">
+          <div class="bar-fill danger" id="gravBar" style="width:0%"></div>
+        </div>
+        <span class="hud-value" id="hudGravPull">0.00</span>
+      </div>
+      <div class="hud-stat-row">
+        <span class="hud-label">DIST</span>
+        <span class="hud-value" id="hudGravDist">∞</span>
+        <span class="hud-unit">m</span>
+      </div>
+
+      <div class="hud-divider"></div>
+      <div class="hud-section-title">SYSTEMS</div>
+      <div class="hud-stat-row">
+        <span class="hud-label">AUTOPILOT</span>
+        <span class="hud-value status-off" id="hudAutopilot">OFF</span>
+      </div>
+      <div class="hud-stat-row">
+        <span class="hud-label">DAMPEN</span>
+        <span class="hud-value status-off" id="hudDampen">OFF</span>
+      </div>
+    </div>
+
+    <!-- Bottom Center: Artificial Horizon / Crosshair -->
+    <div class="hud-center">
+      <div class="crosshair">
+        <div class="ch-h"></div>
+        <div class="ch-v"></div>
+        <div class="ch-circle"></div>
+      </div>
+    </div>
+
+    <!-- Mission Alert -->
+    <div id="missionAlert" class="mission-alert hidden"></div>
+
+    <!-- Checkpoint Ring Indicator -->
+    <div id="checkpointArrow" class="checkpoint-arrow hidden">▶ NEXT CHECKPOINT</div>
+
+    <!-- Warnings -->
+    <div id="warningBanner" class="warning-banner hidden">⚠ GRAVITY WELL PROXIMITY</div>
+
+    <!-- Minimap -->
+    <canvas id="minimap" width="150" height="150"></canvas>
+
+    <!-- Bottom Status Bar -->
+    <div class="hud-bottom-bar">
+      <span id="statusMsg">SYSTEMS NOMINAL</span>
+    </div>
+
+    <!-- Pause Button -->
+    <button id="btnPause" class="btn-pause" title="Pause [ESC]">⏸</button>
+  </div>
+
+  <!-- ===== PAUSE SCREEN ===== -->
+  <div id="pauseScreen" class="hidden">
+    <div class="pause-content">
+      <h2>PAUSED</h2>
+      <button id="btnResume" class="btn-primary">RESUME</button>
+      <button id="btnRestart" class="btn-secondary">RESTART</button>
+    </div>
+  </div>
+
+  <!-- ===== MISSION COMPLETE ===== -->
+  <div id="missionComplete" class="hidden">
+    <div class="complete-content">
+      <div class="complete-title">MISSION COMPLETE</div>
+      <div class="complete-time">TIME: <span id="completeTime">00:00</span></div>
+      <div class="complete-score">SCORE: <span id="completeScore">0</span></div>
+      <button id="btnNextMission" class="btn-primary">NEXT MISSION</button>
+      <button id="btnMainMenu" class="btn-secondary">MAIN MENU</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
